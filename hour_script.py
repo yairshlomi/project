@@ -1,3 +1,6 @@
+from smtplib import SMTP_SSL as SMTP
+import logging, logging.handlers, sys
+from email.mime.text import MIMEText
 import re
 import math
 
@@ -94,7 +97,7 @@ with open('db.txt', "r") as fr:
 			if (row_counter < 10) :
 				data_string = re.findall("[-+]?\d+[\.]?\d*[eE]?[-+]?\d*", line)
 				row_counter += 1
-				#print (data_string)
+				print (data_string)
 
 				if (int (data_string[0]) == 1):
 					if (int (data_string[1]) == 1):
@@ -125,13 +128,13 @@ with open('db.txt', "r") as fr:
 					temp = Packet()
 
 			
-#for data_line in data_sets:
-#	print (data_line)
-temp_expectancy_unit_1 = 0
+for data_line in data_sets:
+	print (data_line)
+temp_expectancy_1 = 0
 flame_expectancy_1 = 0
 smoke_expectancy_1 = 0
 lpg_expectancy_1 = 0
-temp_expectancy_unit_2 = 0
+temp_expectancy_2 = 0
 flame_expectancy_2 = 0
 smoke_expectancy_2 = 0
 lpg_expectancy_2 = 0
@@ -139,40 +142,105 @@ size = len (data_sets)
 
 
 for i in range(1,size):
-	temp_expectancy_unit_1 += math.pow((data_sets[i].get_unit_1_temp() - data_sets[i-1].get_unit_1_temp()), 2)
+	temp_expectancy_1 += math.pow((data_sets[i].get_unit_1_temp() - data_sets[i-1].get_unit_1_temp()), 2)
 	flame_expectancy_1 += math.pow((data_sets[i].get_unit_1_flame() - data_sets[i-1].get_unit_1_flame()), 2)
 	smoke_expectancy_1 += math.pow((data_sets[i].get_unit_1_smoke() - data_sets[i-1].get_unit_1_smoke()), 2)
 	lpg_expectancy_1 += math.pow((data_sets[i].get_unit_1_lpg() - data_sets[i-1].get_unit_1_lpg()), 2)
-	temp_expectancy_unit_2 += math.pow((data_sets[i].get_unit_2_temp() - data_sets[i-1].get_unit_2_temp()), 2)
+	temp_expectancy_2 += math.pow((data_sets[i].get_unit_2_temp() - data_sets[i-1].get_unit_2_temp()), 2)
 	flame_expectancy_2 += math.pow((data_sets[i].get_unit_2_flame() - data_sets[i-1].get_unit_2_flame()), 2)
 	smoke_expectancy_2 += math.pow((data_sets[i].get_unit_2_smoke() - data_sets[i-1].get_unit_2_smoke()), 2)
 	lpg_expectancy_2 += math.pow((data_sets[i].get_unit_2_lpg() - data_sets[i-1].get_unit_2_lpg()), 2)
 
 
-temp_difference_unit_1 = 0
+temp_difference_1 = 0
 flame_difference_1 = 0
 smoke_difference_1 = 0
 lpg_difference_1 = 0
-temp_difference_unit_2 = 0
+temp_difference_2 = 0
 flame_difference_2 = 0
 smoke_difference_2 = 0
-lpg_difference = 0
+lpg_difference_2 = 0
 
-temp_difference_unit_1 = (data_sets[size-1].get_unit_1_temp() - data_sets[0].get_unit_1_temp())
-flame_differencey_1 = (data_sets[size-1].get_unit_1_flame() - data_sets[0].get_unit_1_flame())
+temp_difference_1 = (data_sets[size-1].get_unit_1_temp() - data_sets[0].get_unit_1_temp())
+flame_difference_1 = (data_sets[size-1].get_unit_1_flame() - data_sets[0].get_unit_1_flame())
 smoke_difference_1 = (data_sets[size-1].get_unit_1_smoke() - data_sets[0].get_unit_1_smoke())
 lpg_difference_1 = (data_sets[size-1].get_unit_1_lpg() - data_sets[0].get_unit_1_lpg())
-temp_difference_unit_2 =(data_sets[size-1].get_unit_2_temp() - data_sets[0].get_unit_2_temp())
+temp_difference_2 =(data_sets[size-1].get_unit_2_temp() - data_sets[0].get_unit_2_temp())
 flame_difference_2 = (data_sets[size-1].get_unit_2_flame() - data_sets[0].get_unit_2_flame())
 smoke_difference_2 = (data_sets[size-1].get_unit_2_smoke() - data_sets[0].get_unit_2_smoke())
 lpg_difference_2 = (data_sets[size-1].get_unit_2_lpg() - data_sets[0].get_unit_2_lpg())
 
-print ("the the difference of unit 1 temprature is : " + str(int(temp_difference_unit_1)) + ", the standard deviation of " + str(int(math.sqrt(temp_expectancy_unit_1/size))))
-print ("the the difference of unit 1 flame is : " + str(int(flame_differencey_1)) + ", the standard deviation of " + str(int(math.sqrt(flame_expectancy_1/size))))
-print ("the the difference of unit 1 smoke is : " + str(int(smoke_difference_1)) + ", the standard deviation of " + str(int(math.sqrt(smoke_expectancy_1/size))))
-print ("the the difference of unit 1 lpg is : " + str(int(lpg_difference_1)) + ", the standard deviation of " + str(int(math.sqrt(lpg_expectancy_1/size))))
-print ("the the difference of unit 2 temprature is : " + str(int(temp_difference_unit_2)) + ", the standard deviation of " + str(int(math.sqrt(temp_expectancy_unit_2/size))))
-print ("the the difference of unit 2 flame is : " + str(int(flame_difference_2)) + ", the standard deviation of " + str(int(math.sqrt(flame_expectancy_2/size))))
-print ("the the difference of unit 2 smoke is : " + str(int(smoke_difference_2)) + ", the standard deviation of " + str(int(math.sqrt(smoke_expectancy_2/size))))
-print ("the the difference of unit 2 lpg is : " + str(int(lpg_difference_2)) + ", the standard deviation of " + str(int(math.sqrt(lpg_expectancy_2/size))))
+temp_std_dev_1 = int(math.sqrt(temp_expectancy_1/size))
+flame_std_dev_1 = int(math.sqrt(flame_expectancy_1/size))
+smoke_std_dev_1 = int(math.sqrt(smoke_expectancy_1/size))
+lpg_std_dev_1 = int(math.sqrt(lpg_expectancy_1/size))
+temp_std_dev_2 = int(math.sqrt(temp_expectancy_2/size))
+flame_std_dev_2 = int(math.sqrt(flame_expectancy_2/size))
+smoke_std_dev_2 = int(math.sqrt(smoke_expectancy_2/size))
+lpg_std_dev_2 = int(math.sqrt(lpg_expectancy_2/size))
 
+
+print ("the the difference of unit 1 temprature is : " + str(int(temp_difference_1)) + ", with standard deviation of " + str(temp_std_dev_1))
+print ("the the difference of unit 1 flame is : " + str(int(flame_difference_1)) + ", with standard deviation of " + str(flame_std_dev_1))
+print ("the the difference of unit 1 smoke is : " + str(int(smoke_difference_1)) + ", with standard deviation of " + str(smoke_std_dev_1))
+print ("the the difference of unit 1 lpg is : " + str(int(lpg_difference_1)) + ", with standard deviation of " + str(lpg_std_dev_1))
+print ("the the difference of unit 2 temprature is : " + str(int(temp_difference_2)) + ", with standard deviation of " + str(temp_std_dev_2))
+print ("the the difference of unit 2 flame is : " + str(int(flame_difference_2)) + ", with standard deviation of " + str(flame_std_dev_2))
+print ("the the difference of unit 2 smoke is : " + str(int(smoke_difference_2)) + ", with standard deviation of " + str(smoke_std_dev_2))
+print ("the the difference of unit 2 lpg is : " + str(int(lpg_difference_2)) + ", with standard deviation of " + str(lpg_std_dev_2))
+
+subject = "Unusual values detected"
+body = " "
+if (temp_difference_1 > 12 and temp_std_dev_1 < 4):
+	body = body + "Unusual temprature values detected at unit 1\n"
+
+if (flame_difference_1 < (-100) and flame_std_dev_1 < 50):
+	body = body + "Unusual flame values detected at unit 1\n"
+
+if (smoke_difference_1 > 200 and smoke_std_dev_1 < 30):
+	body = body + "Unusual smoke values detected at unit 1\n"
+
+if (lpg_difference_1 > 200 and lpg_std_dev_1 < 30):
+	body = body + "Unusual lpg values detected at unit 1\n"
+
+if (temp_difference_2 > 12 and temp_std_dev_2 < 4):
+	body = body + "Unusual temprature values detected at unit 2\n"
+
+if (flame_difference_2 < (-100) and flame_std_dev_2 < 500):
+	body = body + "Unusual flame values detected at unit 2\n"
+
+if (smoke_difference_2 > 200 and smoke_std_dev_2 < 30):
+	body = body + "Unusual smoke values detected at unit 2\n"
+
+if (lpg_difference_2 > 200 and lpg_std_dev_2 < 30):
+	body = body + "Unusual lpg values detected at unit 2\n"
+
+if (body.isspace()):
+	print ("no unusual values detected")
+
+else: 
+	print ("sending mails")
+
+	try:
+
+		to = "canarit.gfd@gmail.com" #Recipient's email address
+		frm = "canarit.alarms@gmail.com" #Sender's email address
+		pswd = "canarit2017" #Sender's password
+		sub = subject         #Subject of email
+		text = body                    #Message to send
+		msg = MIMEText(text, 'plain')
+		msg['Subject'] = sub
+		msg['To'] = to
+	except Exception as err:
+		pass
+
+	try:
+		conn = SMTP("smtp.gmail.com")
+		conn.login(frm, pswd)
+		try: 
+			conn.sendmail(frm, to, msg.as_string())
+			print ("mail sent successfully")
+		finally: conn.close()
+	except Exception as exc:
+		print(exc)
+		sys.exit("Mail failed: {}".format(exc))

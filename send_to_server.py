@@ -42,7 +42,7 @@ subject = 'alaram '
 for data in raw:
 	if(int (data['sensor_id']) == 5 and float(data['sensor_data']) > 50 ): #temp
 		temp == True
-	if(int (data['sensor_id']) == 1 and int(data['sensor_data']) > 500 ): #flame
+	if(int (data['sensor_id']) == 1 and int(data['sensor_data']) < 250 ): #flame
 		flame = True
 	if(int (data['sensor_id']) == 3 and int(data['sensor_data']) > 500 ): #smoke
 		smoke = True
