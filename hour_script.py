@@ -3,6 +3,7 @@ import logging, logging.handlers, sys
 from email.mime.text import MIMEText
 import re
 import math
+#run every hour
 
 class Packet:
 
