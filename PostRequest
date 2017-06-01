@@ -1,0 +1,30 @@
+public void HttpPOSTRequestWithArbitaryStringBody() {
+    RequestQueue queue = Volley.newRequestQueue(this);
+    String url = "http://34.204.144.157/api.php";
+    StringRequest postRequest = new StringRequest(Request.Method.POST, url, 
+        new Response.Listener<String>() 
+        {
+            @Override
+            public void onResponse(String response) {
+                Log.d("Response", response);
+            }
+        }, 
+        new Response.ErrorListener() 
+        {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("ERROR","error => "+error.toString());
+            }
+        }
+            ) {  
+         // this is the relevant method   
+        @Override
+        public byte[] getBody() throws AuthFailureError {
+            String httpPostBody="\"type\": \"admin_add_user\", \"values\" : [null, \"shlomo\", \"shula\", \"24\", \"shlomi\", \"shulam\", \"0524474750\", \"canarit.gfd@gmail.com\"]";
+            // usually you'd have a field with some values you'd want to escape, you need to do it yourself if overriding getBody. here's how you do it 
+           
+            return httpPostBody.getBytes();
+        }
+    };
+    queue.add(postRequest);
+}
