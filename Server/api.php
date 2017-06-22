@@ -2,9 +2,15 @@
 
 header('Content-Type: application/json');
 
+	
+//try to connect to the DB
+//based on the request type and some other parmeters, make somw sql queries.
+//most off the queries on this page are performed by the android application
 try {
 	$mysqli = getConnection();
 	switch ($_SERVER['REQUEST_METHOD']) {
+		
+		//get requests - "select" queries
 		case 'GET':
 			switch ($_GET['type']) {
 				case 'log-in':
@@ -47,6 +53,7 @@ try {
 			echo json_encode(selectFromDb($mysqli, $sql));
 			exit;
 		case 'POST':
+			//post request - most of the queries are "insert", some are "update"
 			$body = file_get_contents('php://input');
 			$bodyArray = json_decode($body, true);
 			switch ($bodyArray['type']) {
@@ -81,6 +88,7 @@ try {
 				default:
 					throw new Exception("invalid type {$bodyArray['type']}", 404000);
 			}
+			//after choosing the right query, send it to the DB.
 			insertToDb($mysqli, $table, $keys, $bodyArray['values']);
 			break;
 		default:
@@ -96,6 +104,7 @@ try {
 }
 exit;
 
+//function to connect to the DB
 function getConnection() {
 	$mysqli = new mysqli('127.0.0.1', 'root', 'bitnami', 'canarit');
 	if ($mysqli->connect_errno) {
@@ -105,6 +114,7 @@ function getConnection() {
 	return $mysqli;
 }
 
+//function for "insert" queries
 function insertToDb($mysqli, $table, $keys, $values) {
 	$keysString = implode(",",$keys);
 	$values = array_map(function ($value) use ($mysqli){
@@ -118,6 +128,7 @@ function insertToDb($mysqli, $table, $keys, $values) {
 	}
 }
 
+//function for "update" queries
 function updateDb($mysqli, $sql) {
 	if (!$result = $mysqli->query($sql)) {
 		echo "Error: query failed to execute ({$mysqli->error})";
@@ -125,6 +136,7 @@ function updateDb($mysqli, $sql) {
 	}
 }
 
+//function for "select" queries.
 function selectFromDb($mysqli, $sql) {
 	if (!$result = $mysqli->query($sql)) {
 		echo "Error: query failed to execute ({$mysqli->error})";
