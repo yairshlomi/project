@@ -21,7 +21,6 @@ function sendEmail() {
 		$message = Swift_Message::newInstance($subject)
 			->setFrom(array($from => 'CANARIT'))
 			->setTo(array($to))
-			->setBcc('idoelad@gmail.com')
 			->setBody($body);
 		$result = $mailer->send($message);
 
