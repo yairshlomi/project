@@ -2,6 +2,9 @@
 require_once 'vendor/autoload.php';
 //header('Content-Type: application/json');
 
+
+//2 more queries. one to display html table with the sensors data, made for demonstration/
+// the second query is for inserting the data from the sensors to the DB
 try {
 	$mysqli = getConnection();
 	switch ($_SERVER['REQUEST_METHOD']) {
@@ -41,6 +44,7 @@ try {
 }
 exit;
 
+//try to connect to the DB
 function getConnection() {
 	$mysqli = new mysqli('127.0.0.1', 'root', 'bitnami', 'canarit');
 	if ($mysqli->connect_errno) {
@@ -49,7 +53,7 @@ function getConnection() {
 	}
 	return $mysqli;
 }
-
+//insert data to the DB
 function insertToDb($mysqli, $unitId, $sensorType, $sensorValue) {
 	$sql = "INSERT INTO sensor_data (unit_id, sensor_type, sensor_value) VALUES ($unitId, $sensorType, $sensorValue)";
 	if (!$result = $mysqli->query($sql)) {
@@ -57,7 +61,7 @@ function insertToDb($mysqli, $unitId, $sensorType, $sensorValue) {
 		exit;
 	}
 }
-
+//convert from json to array
 function rsToArray($rs) {
 	$results = [];
 	while($r = $rs->fetch_assoc()) {
@@ -66,6 +70,7 @@ function rsToArray($rs) {
 	return $results;
 }
 
+//check the values. in case of unusual values - send an email adress
 function checkValues($sensorType, $sensorValue) {
 	$flame = $lpg = $smoke = $temp = false;
 	if ($sensorType == 1 && $sensorValue > 250) {
@@ -94,7 +99,6 @@ function checkValues($sensorType, $sensorValue) {
 		$message = Swift_Message::newInstance($subject)
 			->setFrom(array($from => 'CANARIT'))
 			->setTo(array($to))
-			->setBcc('idoelad@gmail.com')
 			->setBody($body);
 
 		$result = $mailer->send($message);
