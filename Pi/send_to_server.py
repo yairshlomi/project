@@ -9,7 +9,7 @@ from email.mime.text import MIMEText
 import json
 import time
 
-
+#read the data that was sent fron the sensors units
 print ("Processing data from sensor units.")
 time.sleep(5)
 to_send = ""
@@ -19,6 +19,7 @@ with open('units.txt', "r") as fr:
 print("Reading from files ended successfully")
 print (to_send)
 
+#send the data to server
 r = requests.post('http://34.204.144.157/index.php', data=to_send)
 time.sleep(3)
 print ("\nthe response code is: " + str(r.status_code) + "\n")
@@ -33,6 +34,7 @@ to_write = "\n" + str(datetime.now().strftime('%H:%M:%S %d-%m-%Y')) + "\n" + to_
 
 #print (to_write)
 
+# write the data to the DB file
 with open('db.txt', "a") as fw:
 	fw.write(to_write)
 	fw.write(" ")
@@ -46,6 +48,9 @@ for line in to_send.splitlines():
                 print (data)
                 raw.append(dict(data))
 
+
+
+#check for dangerous. if there are, send an email message with the sensor number
 
 is_risked = []
 temp = False
