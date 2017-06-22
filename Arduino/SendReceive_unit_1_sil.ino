@@ -4,6 +4,9 @@
 #include<RF24.h>
 #include "DHT.h"
 
+
+//define pins
+
 #define DHTPIN 2
 #define PIRPIN 3
 #define FLAMEPIN A0
@@ -26,6 +29,7 @@ bool fire_temp = false;
 bool fire_lpg = false;
 bool fire_smoke = false;
 
+//define payload for sending the data
 struct payload {
   int id;
   int temp;
@@ -52,7 +56,7 @@ void setup(void){
   dht.begin();
   delay(5000);
 
-
+  ///set the comunication
   radio.begin();
   radio.setPALevel(RF24_PA_MAX);
   radio.setChannel(0x76);
@@ -75,7 +79,7 @@ void loop(void){
    char receiveMessage[32] = {0};
    count = 0;
 
-
+//listen to the radio
    if(radio.available()) {
     radio.read(receiveMessage, sizeof(receiveMessage));
     Serial.println(receiveMessage);
@@ -86,6 +90,7 @@ void loop(void){
 
     Serial.println(stringMessage);
 
+    //if the sample request is recieived - sample the sensors and send back the payload
     if(stringMessage == "SAMPLE") {
       Serial.println("Looks like they want to sample the sensors!");
 
@@ -110,6 +115,8 @@ void loop(void){
 
     }
 
+    //if the recieved request is not sample request it is silencing request
+    //check the id's that was sent and silence them
     else {
       int 1_counet = 0, 2_counet = 0,3_counet = 0, 4_counet = 0;
       for (int j = 0; stringMessage[i] != '0'; j++)
@@ -153,7 +160,7 @@ void loop(void){
 
     }
 
-
+//activate siren if there are unusual values and the sensor is not silenced
     if(sample.temp > 5000 && !temp_alarm || sample.flame > 400 && !flame_alarm|| sample.smoke > 800 && !smoke_alarm|| sample.lpg > 800&& !lpg_alarm) {
       Serial.println("Emergency!");
       tone (BUZZER, 1000, 15000);
@@ -187,7 +194,7 @@ void loop(void){
 
 void sample_sensors(payload *sample, int id) {
 
-
+//sample the sensor and store the values in the payload struct
    sample->id = id;
    float floattemp = dht.readTemperature();
    floattemp *=100;
@@ -206,7 +213,7 @@ void sample_sensors(payload *sample, int id) {
 
 }
 
-
+//convert the struct values to string for sending
 void convert_to_string(payload *sample, char* message) {
 
   char data [32];
@@ -378,6 +385,7 @@ if (temp % 10 == 0) {
 
 }
 
+//revers the numbers
 int reverse(int num) {
 
   int rev = 0;
@@ -406,7 +414,7 @@ int reverse(int num) {
 
 }
 
-
+//count the zeros in the end of the number
 int zeros(int num) {
 
   int count = 0;
