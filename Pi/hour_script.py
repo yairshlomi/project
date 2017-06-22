@@ -6,6 +6,7 @@ from email.mime.text import MIMEText
 import re
 import math
 
+#createv class for packets (1 packet includes the values of each sensor from unit 1 and unit 2, combined with packet id and the time it was sent)
 class Packet:
 
 	def __init__(self):
@@ -88,6 +89,7 @@ packet_counter = 0
 data = ""
 temp = Packet()
 minute_int = 0
+#open the DB file (not the SQL DB), read from it line by line and store it in the packet class objects
 with open('db.txt', "r") as fr:
 	for line in iter(fr):
 		data = line
@@ -133,6 +135,8 @@ for data_line in data_sets:
 	print (data_line)
 	print("")
 
+#calc the expectancy of all the readings in the last hour
+
 temp_expectancy_1 = 0
 flame_expectancy_1 = 0
 smoke_expectancy_1 = 0
@@ -164,6 +168,8 @@ flame_difference_2 = 0
 smoke_difference_2 = 0
 lpg_difference_2 = 0
 
+
+#calc the differnces and the standard deviation of all the readings in the last hour
 temp_difference_1 = (data_sets[size-1].get_unit_1_temp() - data_sets[0].get_unit_1_temp())
 flame_difference_1 = (data_sets[size-1].get_unit_1_flame() - data_sets[0].get_unit_1_flame())
 smoke_difference_1 = (data_sets[size-1].get_unit_1_smoke() - data_sets[0].get_unit_1_smoke())
@@ -192,6 +198,8 @@ print ("the the difference of unit 2 flame is : " + str(int(flame_difference_2))
 print ("the the difference of unit 2 smoke is : " + str(int(smoke_difference_2)) + ", with standard deviation of " + str(smoke_std_dev_2))
 print ("the the difference of unit 2 lpg is : " + str(int(lpg_difference_2)) + ", with standard deviation of " + str(lpg_std_dev_2))
 
+
+#if there is unusual value (if the standard deviation is too big) send mail.
 subject = "Unusual values detected"
 body = " "
 if (temp_difference_1 > 12 and temp_std_dev_1 < 4):
