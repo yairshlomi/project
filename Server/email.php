@@ -1,6 +1,9 @@
 <?php
 require_once 'vendor/autoload.php';
 //header('Content-Type: application/json');
+
+//in case of emergency, send an email message
+
 sendEmail();
 
 function sendEmail() {
